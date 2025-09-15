@@ -4,12 +4,17 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Menu, X, Send, ArrowRight, User, ExternalLink } from "lucide-react";
 
 /**
- * Полный рабочий файл страницы (Next App Router).
- * 3D-фон включён (ParallaxBlobs) — контейнер имеет z-0.
+ * Next App Router: страница с 3D-фоном и dev-панелью,
+ * которая скрыта в production (Vercel).
  */
 
+// Показывать тесты? (dev или ручное включение переменной)
+const showTests =
+  process.env.NODE_ENV !== "production" ||
+  process.env.NEXT_PUBLIC_SHOW_TESTS === "1";
+
 // Анимированная «звёздочка»
-function ShinyStar({ className = "" }) {
+function ShinyStar({ className = "" }: { className?: string }) {
   return (
     <span className={"relative inline-block w-4 h-4 " + className} aria-hidden="true">
       <span
@@ -366,7 +371,7 @@ function ReviewsList({ items, clientId, isOwner, onDelete, onEdit }: any) {
   );
 }
 
-/** Тест-панель (можно скрыть) */
+/** Тест-панель (показываем только если showTests=true) */
 function DevTests() {
   const [open, setOpen] = useState(false);
   const [results, setResults] = useState<any[]>([]);
@@ -404,7 +409,7 @@ function DevTests() {
   );
 }
 
-/** 3D-фон с «пузырями» */
+/** 3D-фон */
 function ParallaxBlobs() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const blobsRef = useRef<Array<HTMLDivElement | null>>([]);
@@ -514,7 +519,8 @@ export default function PortfolioPreview() {
     <>
       <ParallaxBlobs />
       <div className="relative z-20 isolate min-h-screen text-neutral-100 scroll-smooth">
-        <DevTests />
+        {/* Тесты только в dev / по флагу */}
+        {showTests && <DevTests />}
 
         {/* Header */}
         <header className="sticky top-0 z-50 backdrop-blur bg-neutral-950/70 border-b border-neutral-800">
@@ -589,7 +595,6 @@ export default function PortfolioPreview() {
           </div>
           <p className="mt-2 text-neutral-400 text-sm">Свой отзыв о моей работе вы можете оставить в Telegram.</p>
           <a id="leave-review-btn" href={TELEGRAM_REVIEWS_URL} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-violet-600 text-white font-semibold shadow-lg shadow-violet-600/20 ring-1 ring-violet-500/50">Оставить отзыв в Telegram <ExternalLink className="w-4 h-4" /></a>
-          {/* Если захочешь включить локальную форму: <ReviewForm onSubmit={add} /> */}
           <ReviewsList items={reviews} clientId={clientId} isOwner={isOwner} onDelete={(id: any)=>remove(id)} onEdit={(id: any,patch: any)=>update(id,patch)} />
         </section>
 
@@ -638,9 +643,9 @@ export default function PortfolioPreview() {
               <h2 className="text-2xl md:text-3xl font-bold">Портфолио</h2>
               <div className="mt-2">
                 {pfTab === "Дизайн" ? (
-                  <a href={TELEGRAM_PORTFOLIO_DESIGN} target="_blank" rel="noopener noreferrer" className="text-sm text-violet-400 hover:text-вiolet-300 inline-flex items-center gap-1">Все работы по дизайну в Telegram <ExternalLink className="w-4 h-4" /></a>
+                  <a href={TELEGRAM_PORTFOLIO_DESIGN} target="_blank" rel="noopener noreferrer" className="text-sm text-violet-400 hover:text-violet-300 inline-flex items-center gap-1">Все работы по дизайну в Telegram <ExternalLink className="w-4 h-4" /></a>
                 ) : (
-                  <a href={TELEGRAM_PORTFOLIO_VIDEO} target="_blank" rel="noopener noreferrer" className="text-sm text-violet-400 hover:text-вiolet-300 inline-flex items-center gap-1">Все работы по видео в Telegram <ExternalLink className="w-4 h-4" /></a>
+                  <a href={TELEGRAM_PORTFOLIO_VIDEO} target="_blank" rel="noopener noreferrer" className="text-sm text-violet-400 hover:text-violet-300 inline-flex items-center gap-1">Все работы по видео в Telegram <ExternalLink className="w-4 h-4" /></a>
                 )}
               </div>
               <div className="mt-4 flex flex-wrap gap-2">
@@ -662,11 +667,11 @@ export default function PortfolioPreview() {
         <section id="contact" className="scroll-mt-28 sm:scroll-mt-24 mx-auto max-w-6xl px-4 py-16">
           <h2 className="text-2xl md:text-3xl font-bold">Контакты</h2>
           <p className="mt-2 text-neutral-300">Самый быстрый способ связи — Telegram.</p>
-          <a href={TELEGRAM} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-вiolet-600 text-white font-semibold shadow-lg shadow-violet-600/20 ring-1 ring-вiolet-500/50">Написать в Telegram <ArrowRight className="w-4 h-4" /></a>
+          <a href={TELEGRAM} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-violet-600 text-white font-semibold shadow-lg shadow-violet-600/20 ring-1 ring-violet-500/50">Написать в Telegram <ArrowRight className="w-4 h-4" /></a>
         </section>
 
         {/* Footer */}
-        <footer className="py-10 text-center text-sm text-neutral-500 border-т border-neutral-800">
+        <footer className="py-10 text-center text-sm text-neutral-500 border-t border-neutral-800">
           <div className="max-w-6xl mx-auto px-4">© {new Date().getFullYear()} Somov Production. Сделано с любовью к дизайну.</div>
         </footer>
       </div>
