@@ -4,10 +4,11 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Menu, X, Send, ArrowRight, User, ExternalLink } from "lucide-react";
 
 /**
- * Полный рабочий файл (Next app/page.tsx).
- * Исправлены ошибки: корректные ref-коллбэки и TS-совместимость.
+ * Полный рабочий файл страницы (Next App Router).
+ * 3D-фон включён (ParallaxBlobs) — контейнер имеет z-0.
  */
 
+// Анимированная «звёздочка»
 function ShinyStar({ className = "" }) {
   return (
     <span className={"relative inline-block w-4 h-4 " + className} aria-hidden="true">
@@ -24,13 +25,16 @@ function ShinyStar({ className = "" }) {
   );
 }
 
+// Ссылки
 const TELEGRAM = "https://t.me/Somov2k03";
 const TELEGRAM_REVIEWS_URL = "https://t.me/potfolio_Somov/5";
 const TELEGRAM_PORTFOLIO_DESIGN = "https://t.me/portfolio_design_Somov";
 const TELEGRAM_PORTFOLIO_VIDEO = "https://t.me/portfolio_reels_Somov";
 
+// Фото героя
 const HERO_PHOTO = "/hero.jpg";
 
+// Меню
 const MENU = [
   { label: "Главная", href: "#home" },
   { label: "Отзывы", href: "#reviews" },
@@ -39,21 +43,41 @@ const MENU = [
   { label: "Контакты", href: "#contact" },
 ];
 
+// Услуги
 const SERVICES = [
-  { title: "Сайты на Tilda", desc: "Адаптивные лендинги и многостраничные сайты на Tilda под ваши задачи.", priceText: "2 000₽ / блок", features: ["Структура и дизайн блоков","Базовая SEO-настройка","Подключение домена (по желанию)"] },
-  { title: "Визуальное оформление соцсетей (ВК)", desc: "Полное оформление сообщества ВКонтакте.", priceText: "от 1 500₽", variants: [{ name: "ВК под ключ", price: "6 000₽" },{ name: "Обложка", price: "1 500₽" }] },
-  { title: "Инфопродукты", desc: "Гайды, чек‑листы, руководства, продающие презентации.", priceText: "350₽ / слайд" },
+  {
+    title: "Сайты на Tilda",
+    desc: "Адаптивные лендинги и многостраничные сайты на Tilda под ваши задачи.",
+    priceText: "2 000₽ / блок",
+    features: [
+      "Структура и дизайн блоков",
+      "Базовая SEO-настройка",
+      "Подключение домена (по желанию)",
+    ],
+  },
+  {
+    title: "Визуальное оформление соцсетей (ВК)",
+    desc: "Полное оформление сообщества ВКонтакте.",
+    priceText: "от 1 500₽",
+    variants: [
+      { name: "ВК под ключ", price: "6 000₽" },
+      { name: "Обложка", price: "1 500₽" },
+    ],
+  },
+  { title: "Инфопродукты", desc: "Гайды, чек-листы, руководства, продающие презентации.", priceText: "350₽ / слайд" },
   { title: "Рекламные креативы", desc: "Статичные и анимированные креативы для рекламы.", priceText: "от 500₽" },
   { title: "Инфографика (карточки маркетплейсов)", desc: "Карточки товаров для Wildberries/OZON и других площадок.", priceText: "350₽ / шт" },
-  { title: "Логотип и фирменный стиль", desc: "Разработка логотипа и базовой айдентики.", priceText: "от 3 000₽" },
-  { title: "Reels / монтаж видео", desc: "Монтаж коротких роликов для соцсетей.", priceText: "от 1 000₽", note: "Итоговая стоимость зависит от задач и сложности — уточните в сообщении." },
-  { title: "Видеомонтаж для онлайн‑школ", desc: "Уроки, автовебинары, заставки для уроков или вебинаров.", priceText: "цена договорная" },
+  { title: "Логотип и фирменный стиль", desc: "Разработка логотипа и базовой айдентики.", priceText: "от 3 000₽" },
+  { title: "Reels / монтаж видео", desc: "Монтаж коротких роликов для соцсетей.", priceText: "от 1 000₽", note: "Итоговая стоимость зависит от задач и сложности — уточните в сообщении." },
+  { title: "Видеомонтаж для онлайн-школ", desc: "Уроки, автовебинары, заставки для уроков или вебинаров.", priceText: "цена договорная" },
   { title: "Монтаж заставок / промо / YouTube / креативов", desc: "Подготовка пакетов под канал и рекламу.", priceText: "цена договорная" },
-  { title: "Сайты на базе ИИ", desc: "Сборка и дизайн лендингов с применением ИИ‑инструментов.", priceText: "цена договорная" },
+  { title: "Сайты на базе ИИ", desc: "Сборка и дизайн лендингов с применением ИИ-инструментов.", priceText: "цена договорная" },
 ];
 
+// Портфолио: вкладки
 const PORTFOLIO_TABS = ["Дизайн", "Видео"];
 
+// Отзывы (preset — дата фиксирована 12.09.2025)
 const INITIAL_REVIEWS = [
   { id: "preset-1", name: "Юля", text: "Заказывали инфографику для маркетплейсов. Никита сделал всё в оговорённый срок. Правки вносились быстро. Спасибо!", sourceUrl: TELEGRAM_REVIEWS_URL, createdAt: "2025-09-12T00:00:00.000Z", authorId: "preset" },
   { id: "preset-2", name: "Helen RBP", text: "Делала заказ у Никиты для баннера и аватарки на YouTube. Выполнил очень быстро, мы остались довольны! Хорошее качество работы и внимательный человек. Рекомендую!", sourceUrl: TELEGRAM_REVIEWS_URL, createdAt: "2025-09-12T00:00:00.000Z", authorId: "preset" },
@@ -66,6 +90,7 @@ const INITIAL_REVIEWS = [
   { id: "preset-9", name: "Клиент", text: "Заказал логотип и фирменный стиль компании — всё чётко, с первого раза попал. Очень понравилось!", sourceUrl: TELEGRAM_REVIEWS_URL, createdAt: "2025-09-12T00:00:00.000Z", authorId: "preset" },
 ];
 
+/** Утилиты */
 const sanitize = (s: string) => (s || "").replace(/[<>]/g, "");
 
 const formatDate = (iso: string) => {
@@ -76,6 +101,7 @@ const formatDate = (iso: string) => {
   } catch { return ""; }
 };
 
+/** Плавная прокрутка */
 function useSmoothScroll() {
   return useCallback((hash?: string) => {
     try {
@@ -90,6 +116,7 @@ function useSmoothScroll() {
   }, []);
 }
 
+/** Хук отзывов (localStorage + авторство + админ) */
 function useReviews() {
   const KEY = "somov_reviews";
   const CLIENT_KEY = "somov_client";
@@ -187,6 +214,7 @@ function useReviews() {
   return { items, add, remove, update, clientId, isOwner };
 }
 
+/** Форма отзыва (не используется на странице; можно включить при желании) */
 function ReviewForm({ onSubmit }: { onSubmit: (r: any) => void }) {
   const [name, setName] = useState("");
   const [text, setText] = useState("");
@@ -243,6 +271,7 @@ function ReviewForm({ onSubmit }: { onSubmit: (r: any) => void }) {
   );
 }
 
+/** Список отзывов */
 function ReviewsList({ items, clientId, isOwner, onDelete, onEdit }: any) {
   const [showAll, setShowAll] = useState(false);
   const [edit, setEdit] = useState<any>(null);
@@ -337,6 +366,7 @@ function ReviewsList({ items, clientId, isOwner, onDelete, onEdit }: any) {
   );
 }
 
+/** Тест-панель (можно скрыть) */
 function DevTests() {
   const [open, setOpen] = useState(false);
   const [results, setResults] = useState<any[]>([]);
@@ -374,6 +404,7 @@ function DevTests() {
   );
 }
 
+/** 3D-фон с «пузырями» */
 function ParallaxBlobs() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const blobsRef = useRef<Array<HTMLDivElement | null>>([]);
@@ -427,7 +458,7 @@ function ParallaxBlobs() {
   }, [config]);
 
   return (
-    <div ref={containerRef} className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden>
+    <div ref={containerRef} className="fixed inset-0 z-0 overflow-hidden pointer-events-none" aria-hidden>
       <div className="absolute inset-0 bg-gradient-to-b from-neutral-950 via-neutral-950 to-neutral-900" />
       {config.map((c, i) => (
         <div
@@ -454,6 +485,7 @@ function ParallaxBlobs() {
   );
 }
 
+// Карточка с фото
 function TiltPhotoCard({ src, alt }: { src: string; alt: string }) {
   return (
     <div className="relative">
@@ -481,7 +513,7 @@ export default function PortfolioPreview() {
   return (
     <>
       <ParallaxBlobs />
-      <div className="relative z-20 min-h-screen text-neutral-100 scroll-smooth">
+      <div className="relative z-20 isolate min-h-screen text-neutral-100 scroll-smooth">
         <DevTests />
 
         {/* Header */}
@@ -557,8 +589,7 @@ export default function PortfolioPreview() {
           </div>
           <p className="mt-2 text-neutral-400 text-sm">Свой отзыв о моей работе вы можете оставить в Telegram.</p>
           <a id="leave-review-btn" href={TELEGRAM_REVIEWS_URL} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-violet-600 text-white font-semibold shadow-lg shadow-violet-600/20 ring-1 ring-violet-500/50">Оставить отзыв в Telegram <ExternalLink className="w-4 h-4" /></a>
-          {/* Локальная форма (при желании можно показать) */}
-          {/* <ReviewForm onSubmit={add} /> */}
+          {/* Если захочешь включить локальную форму: <ReviewForm onSubmit={add} /> */}
           <ReviewsList items={reviews} clientId={clientId} isOwner={isOwner} onDelete={(id: any)=>remove(id)} onEdit={(id: any,patch: any)=>update(id,patch)} />
         </section>
 
@@ -600,16 +631,16 @@ export default function PortfolioPreview() {
           </div>
         </section>
 
-        {/* Portfolio */}
+        {/* Портфолио */}
         <section id="portfolio" className="scroll-mt-28 sm:scroll-mt-24 mx-auto max-w-6xl px-4 py-16">
           <div className="flex items-start justify-between gap-4">
             <div>
               <h2 className="text-2xl md:text-3xl font-bold">Портфолио</h2>
               <div className="mt-2">
                 {pfTab === "Дизайн" ? (
-                  <a href={TELEGRAM_PORTFOLIO_DESIGN} target="_blank" rel="noopener noreferrer" className="text-sm text-violet-400 hover:text-violet-300 inline-flex items-center gap-1">Все работы по дизайну в Telegram <ExternalLink className="w-4 h-4" /></a>
+                  <a href={TELEGRAM_PORTFOLIO_DESIGN} target="_blank" rel="noopener noreferrer" className="text-sm text-violet-400 hover:text-вiolet-300 inline-flex items-center gap-1">Все работы по дизайну в Telegram <ExternalLink className="w-4 h-4" /></a>
                 ) : (
-                  <a href={TELEGRAM_PORTFOLIO_VIDEO} target="_blank" rel="noopener noreferrer" className="text-sm text-violet-400 hover:text-violet-300 inline-flex items-center gap-1">Все работы по видео в Telegram <ExternalLink className="w-4 h-4" /></a>
+                  <a href={TELEGRAM_PORTFOLIO_VIDEO} target="_blank" rel="noopener noreferrer" className="text-sm text-violet-400 hover:text-вiolet-300 inline-flex items-center gap-1">Все работы по видео в Telegram <ExternalLink className="w-4 h-4" /></a>
                 )}
               </div>
               <div className="mt-4 flex flex-wrap gap-2">
@@ -631,11 +662,11 @@ export default function PortfolioPreview() {
         <section id="contact" className="scroll-mt-28 sm:scroll-mt-24 mx-auto max-w-6xl px-4 py-16">
           <h2 className="text-2xl md:text-3xl font-bold">Контакты</h2>
           <p className="mt-2 text-neutral-300">Самый быстрый способ связи — Telegram.</p>
-          <a href={TELEGRAM} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-violet-600 text-white font-semibold shadow-lg shadow-violet-600/20 ring-1 ring-violet-500/50">Написать в Telegram <ArrowRight className="w-4 h-4" /></a>
+          <a href={TELEGRAM} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-вiolet-600 text-white font-semibold shadow-lg shadow-violet-600/20 ring-1 ring-вiolet-500/50">Написать в Telegram <ArrowRight className="w-4 h-4" /></a>
         </section>
 
         {/* Footer */}
-        <footer className="py-10 text-center text-sm text-neutral-500 border-t border-neutral-800">
+        <footer className="py-10 text-center text-sm text-neutral-500 border-т border-neutral-800">
           <div className="max-w-6xl mx-auto px-4">© {new Date().getFullYear()} Somov Production. Сделано с любовью к дизайну.</div>
         </footer>
       </div>
