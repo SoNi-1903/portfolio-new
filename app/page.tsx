@@ -1,14 +1,14 @@
 'use client'
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { Menu, X, Send, ArrowRight, User, ExternalLink } from "lucide-react";
+import { Menu, X, Send, ArrowRight, ExternalLink } from "lucide-react";
 
 /**
- * Полный рабочий файл предпросмотра (Next app/page.tsx эквивалент).
- * Исправлены ошибки JSX, звёздочки анимируются плавно, ссылка на отзывы ведёт на нужный Telegram.
+ * Next.js App Router страница с анимацией фона, портфолио и отзывами.
+ * Во вкладке «Отзывы» — текст + кнопка на Telegram (без формы).
  */
 
-// Анимированный элемент‑иконка (фиолетовая «звёздочка»)
+// Анимированная «звёздочка»
 function ShinyStar({ className = "" }) {
   return (
     <span className={"relative inline-block w-4 h-4 " + className} aria-hidden="true">
@@ -48,7 +48,7 @@ const SERVICES = [
   {
     title: "Сайты на Tilda",
     desc: "Адаптивные лендинги и многостраничные сайты на Tilda под ваши задачи.",
-    priceText: "2 000₽ / блок",
+    priceText: "2 000₽ / блок",
     features: [
       "Структура и дизайн блоков",
       "Базовая SEO-настройка",
@@ -58,20 +58,20 @@ const SERVICES = [
   {
     title: "Визуальное оформление соцсетей (ВК)",
     desc: "Полное оформление сообщества ВКонтакте.",
-    priceText: "от 1 500₽",
+    priceText: "от 1 500₽",
     variants: [
-      { name: "ВК под ключ", price: "6 000₽" },
-      { name: "Обложка", price: "1 500₽" },
+      { name: "ВК под ключ", price: "6 000₽" },
+      { name: "Обложка", price: "1 500₽" },
     ],
   },
-  { title: "Инфопродукты", desc: "Гайды, чек‑листы, руководства, продающие презентации.", priceText: "350₽ / слайд" },
+  { title: "Инфопродукты", desc: "Гайды, чек-листы, руководства, продающие презентации.", priceText: "350₽ / слайд" },
   { title: "Рекламные креативы", desc: "Статичные и анимированные креативы для рекламы.", priceText: "от 500₽" },
   { title: "Инфографика (карточки маркетплейсов)", desc: "Карточки товаров для Wildberries/OZON и других площадок.", priceText: "350₽ / шт" },
-  { title: "Логотип и фирменный стиль", desc: "Разработка логотипа и базовой айдентики.", priceText: "от 3 000₽" },
-  { title: "Reels / монтаж видео", desc: "Монтаж коротких роликов для соцсетей.", priceText: "от 1 000₽", note: "Итоговая стоимость зависит от задач и сложности — уточните в сообщении." },
-  { title: "Видеомонтаж для онлайн‑школ", desc: "Уроки, автовебинары, заставки для уроков или вебинаров.", priceText: "цена договорная" },
+  { title: "Логотип и фирменный стиль", desc: "Разработка логотипа и базовой айдентики.", priceText: "от 3 000₽" },
+  { title: "Reels / монтаж видео", desc: "Монтаж коротких роликов для соцсетей.", priceText: "от 1 000₽", note: "Итоговая стоимость зависит от задач и сложности — уточните в сообщении." },
+  { title: "Видеомонтаж для онлайн-школ", desc: "Уроки, автовебинары, заставки для уроков или вебинаров.", priceText: "цена договорная" },
   { title: "Монтаж заставок / промо / YouTube / креативов", desc: "Подготовка пакетов под канал и рекламу.", priceText: "цена договорная" },
-  { title: "Сайты на базе ИИ", desc: "Сборка и дизайн лендингов с применением ИИ‑инструментов.", priceText: "цена договорная" },
+  { title: "Сайты на базе ИИ", desc: "Сборка и дизайн лендингов с применением ИИ-инструментов.", priceText: "цена договорная" },
 ];
 
 // Портфолио: две вкладки
@@ -91,9 +91,9 @@ const INITIAL_REVIEWS = [
 ];
 
 /** Утилиты */
-const sanitize = (s) => (s || "").replace(/[<>]/g, "");
+const sanitize = (s: string) => (s || "").replace(/[<>]/g, "");
 
-const formatDate = (iso) => {
+const formatDate = (iso: string) => {
   try {
     const d = new Date(iso);
     if (Number.isNaN(d.getTime())) return "";
@@ -103,7 +103,7 @@ const formatDate = (iso) => {
 
 /** Плавная прокрутка */
 function useSmoothScroll() {
-  return useCallback((hash) => {
+  return useCallback((hash?: string) => {
     try {
       const id = hash?.startsWith("#") ? hash : `#${hash}`;
       const el = id && document.querySelector(id);
@@ -136,7 +136,7 @@ function useReviews() {
 
   const [items, setItems] = useState(INITIAL_REVIEWS);
 
-  const stripTest = useCallback((list) => {
+  const stripTest = useCallback((list: any[]) => {
     try {
       return (list || []).filter((r) => {
         const name = (r?.name || "").trim().toLowerCase();
@@ -155,7 +155,7 @@ function useReviews() {
         const parsed = Array.isArray(JSON.parse(raw)) ? JSON.parse(raw) : [];
         const byId = new Map();
         [...INITIAL_REVIEWS, ...parsed].forEach((it) => byId.set(it.id || `${it.name}-${it.createdAt}`, it));
-        const merged = stripTest(Array.from(byId.values())).map((it) => ({
+        const merged = stripTest(Array.from(byId.values())).map((it: any) => ({
           ...it,
           createdAt: it?.createdAt ?? new Date().toISOString(),
           authorId: it?.authorId ?? "preset",
@@ -163,7 +163,7 @@ function useReviews() {
         setItems(merged);
         localStorage.setItem(KEY, JSON.stringify(merged));
       } else {
-        const seeded = stripTest(INITIAL_REVIEWS).map((it) => ({
+        const seeded = stripTest(INITIAL_REVIEWS).map((it: any) => ({
           ...it,
           createdAt: it?.createdAt ?? new Date().toISOString(),
           authorId: it?.authorId ?? "preset",
@@ -171,11 +171,11 @@ function useReviews() {
         localStorage.setItem(KEY, JSON.stringify(seeded));
         setItems(seeded);
       }
-    } catch { setItems(stripTest(INITIAL_REVIEWS)); }
+    } catch { setItems(stripTest(INITIAL_REVIEWS as any)); }
   }, [stripTest]);
 
-  const add = useCallback((review) => {
-    setItems((prev) => {
+  const add = useCallback((review: any) => {
+    setItems((prev: any[]) => {
       const item = { id: Date.now(), createdAt: new Date().toISOString(), authorId: clientId, ...review };
       const next = [item, ...prev];
       const cleaned = stripTest(next);
@@ -184,20 +184,20 @@ function useReviews() {
     });
   }, [stripTest, clientId]);
 
-  const remove = useCallback((id) => {
+  const remove = useCallback((id: any) => {
     if (!id) return;
-    setItems((prev) => {
-      const next = prev.filter((it) => it.id !== id);
+    setItems((prev: any[]) => {
+      const next = prev.filter((it: any) => it.id !== id);
       const cleaned = stripTest(next);
       try { localStorage.setItem(KEY, JSON.stringify(cleaned)); } catch {}
       return cleaned;
     });
   }, [stripTest]);
 
-  const update = useCallback((id, patch) => {
+  const update = useCallback((id: any, patch: any) => {
     if (!id) return;
-    setItems((prev) => {
-      const next = prev.map((it) => (it.id === id ? { ...it, ...patch } : it));
+    setItems((prev: any[]) => {
+      const next = prev.map((it: any) => (it.id === id ? { ...it, ...patch } : it));
       const cleaned = stripTest(next);
       try { localStorage.setItem(KEY, JSON.stringify(cleaned)); } catch {}
       return cleaned;
@@ -206,7 +206,6 @@ function useReviews() {
 
   useEffect(() => {
     try {
-      // Включение/выключение админ-режима (для редактирования/удаления своих карточек)
       (window as any).somov_admin_on = () => { localStorage.setItem(OWNER_KEY, "1"); alert("Admin mode ON. Reload page."); };
       (window as any).somov_admin_off = () => { localStorage.removeItem(OWNER_KEY); alert("Admin mode OFF. Reload page."); };
     } catch {}
@@ -215,7 +214,7 @@ function useReviews() {
   return { items, add, remove, update, clientId, isOwner };
 }
 
-/** Список отзывов (форма ввода скрыта — отзывы оставляются в Telegram) */
+/** Список отзывов (форма убрана — отзывы оставляются в Telegram) */
 function ReviewsList({ items, clientId, isOwner, onDelete, onEdit }) {
   const [showAll, setShowAll] = useState(false);
   const [edit, setEdit] = useState<any>(null);
@@ -265,7 +264,14 @@ function ReviewsList({ items, clientId, isOwner, onDelete, onEdit }) {
 
       {items.length > 6 && (
         <div className="mt-6 flex justify-center">
-          <button onClick={() => setShowAll((v) => !v)} className="px-4 py-2 rounded-2xl bg-neutral-900 text-white font-medium ring-1 ring-neutral-700 hover:ring-neutral-500 transition" aria-expanded={showAll} aria-controls="reviews-list">{showAll ? "Свернуть" : `Посмотреть ещё (${items.length - 6})`}</button>
+          <button
+            onClick={() => setShowAll((v) => !v)}
+            className="px-4 py-2 rounded-2xl bg-neutral-900 text-white font-medium ring-1 ring-neutral-700 hover:ring-neutral-500 transition"
+            aria-expanded={showAll}
+            aria-controls="reviews-list"
+          >
+            {showAll ? "Свернуть" : `Посмотреть ещё (${items.length - 6})`}
+          </button>
         </div>
       )}
 
@@ -289,7 +295,7 @@ function ReviewsList({ items, clientId, isOwner, onDelete, onEdit }) {
       {/* Modal: delete */}
       {delId && (
         <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm grid place-items-center" onClick={() => setDelId(null)}>
-          <div className="w-full max-w-md rounded-2xl bg-neutral-900 border border-neutral-700 p-5" onClick={(e) => e.stopPropagation())}>
+          <div className="w-full max-w-md rounded-2xl bg-neutral-900 border border-neutral-700 p-5" onClick={(e) => e.stopPropagation()}>
             <h4 className="font-semibold text-neutral-100">Удалить отзыв?</h4>
             <p className="mt-2 text-neutral-300 text-sm">Действие нельзя отменить.</p>
             <div className="mt-4 flex justify-end gap-2">
@@ -303,7 +309,7 @@ function ReviewsList({ items, clientId, isOwner, onDelete, onEdit }) {
   );
 }
 
-/** Тест‑панель */
+/** Тест-панель */
 function DevTests() {
   const [open, setOpen] = useState(false);
   const [results, setResults] = useState<any[]>([]);
@@ -394,7 +400,7 @@ function ParallaxBlobs() {
   }, [config]);
 
   return (
-    <div ref={containerRef} className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden>
+    <div ref={containerRef} className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden={true}>
       <div className="absolute inset-0 bg-gradient-to-b from-neutral-950 via-neutral-950 to-neutral-900" />
       {config.map((c, i) => (
         <div key={i} ref={(el) => (blobsRef.current[i] = el!)} style={{
@@ -429,7 +435,7 @@ function TiltPhotoCard({ src, alt }: { src: string; alt: string }) {
 export default function PortfolioPreview() {
   const [open, setOpen] = useState(false);
   const scrollTo = useSmoothScroll();
-  const { items: reviews, add, remove, update, clientId, isOwner } = useReviews();
+  const { items: reviews, remove, update, clientId, isOwner } = useReviews(); // add не используем
   const [pfTab, setPfTab] = useState("Дизайн");
 
   return (
@@ -511,7 +517,7 @@ export default function PortfolioPreview() {
           </div>
           <p className="mt-2 text-neutral-400 text-sm">Свой отзыв о моей работе вы можете оставить в Telegram.</p>
           <a id="leave-review-btn" href={TELEGRAM_REVIEWS_URL} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-violet-600 text-white font-semibold shadow-lg shadow-violet-600/20 ring-1 ring-violet-500/50">Оставить отзыв в Telegram <ExternalLink className="w-4 h-4" /></a>
-          <ReviewsList items={reviews} clientId={clientId} isOwner={isOwner} onDelete={(id)=>remove(id)} onEdit={(id,patch)=>update(id,patch)} />
+          <ReviewsList items={reviews} clientId={clientId} isOwner={isOwner} onDelete={(id: any)=>remove(id)} onEdit={(id: any,patch: any)=>update(id,patch)} />
         </section>
 
         {/* Services */}
@@ -561,7 +567,7 @@ export default function PortfolioPreview() {
                 {pfTab === "Дизайн" ? (
                   <a href={TELEGRAM_PORTFOLIO_DESIGN} target="_blank" rel="noopener noreferrer" className="text-sm text-violet-400 hover:text-violet-300 inline-flex items-center gap-1">Все работы по дизайну в Telegram <ExternalLink className="w-4 h-4" /></a>
                 ) : (
-                  <a href={TELEGRAM_PORTFOLIO_VIDEO} target="_blank" rel="noopener noreferrer" className="text-sm text-violet-400 hover:text-violet-300 inline-flex items-center gap-1">Все работы по видео в Telegram <ExternalLink className="w-4 h-4" /></a>
+                  <a href={TELEGRAM_PORTFOLIO_VIDEO} target="_blank" rel="noopener noreferrer" className="text-sm text-violet-400 hover:text-вiolet-300 inline-flex items-center gap-1">Все работы по видео в Telegram <ExternalLink className="w-4 h-4" /></a>
                 )}
               </div>
               <div className="mt-4 flex flex-wrap gap-2">
