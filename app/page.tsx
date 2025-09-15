@@ -77,7 +77,7 @@ const SERVICES = [
 // Портфолио: две вкладки
 const PORTFOLIO_TABS = ["Дизайн", "Видео"];
 
-// Отзывы (preset — дата фиксирована 12.09.2025)
+// Отзывы (preset)
 const INITIAL_REVIEWS = [
   { id: "preset-1", name: "Юля", text: "Заказывали инфографику для маркетплейсов. Никита сделал всё в оговорённый срок. Правки вносились быстро. Спасибо!", sourceUrl: TELEGRAM_REVIEWS_URL, createdAt: "2025-09-12T00:00:00.000Z", authorId: "preset" },
   { id: "preset-2", name: "Helen RBP", text: "Делала заказ у Никиты для баннера и аватарки на YouTube. Выполнил очень быстро, мы остались довольны! Хорошее качество работы и внимательный человек. Рекомендую!", sourceUrl: TELEGRAM_REVIEWS_URL, createdAt: "2025-09-12T00:00:00.000Z", authorId: "preset" },
@@ -389,9 +389,9 @@ function ParallaxBlobs() {
         const ox = Math.cos(t * c.orbSpeed + c.phase) * c.orbR;
         const oy = Math.sin(t * c.orbSpeed * 0.9 + c.phase2) * c.orbR;
         const scale = 0.98 + 0.04 * Math.sin(t * c.orbSpeed * 0.7 + c.phase);
-        el.style.transform = `translate(-50%, -50%) translate3d(${(baseTx + ox) | 0}px, ${(baseTy + oy) | 0}px, 0) scale(${scale.toFixed(3)})`;
+        (el as HTMLDivElement).style.transform = `translate(-50%, -50%) translate3d(${(baseTx + ox) | 0}px, ${(baseTy + oy) | 0}px, 0) scale(${scale.toFixed(3)})`;
         const hue = c.hue + Math.sin(t * c.hueSpeed + c.phase) * c.hueAmp;
-        el.style.background = `radial-gradient(circle at 50% 50%, hsl(${hue} 95% 62% / 0.95) 0%, hsl(${hue} 90% 55% / 0.50) 35%, transparent 70%)`;
+        (el as HTMLDivElement).style.background = `radial-gradient(circle at 50% 50%, hsl(${hue} 95% 62% / 0.95) 0%, hsl(${hue} 90% 55% / 0.50) 35%, transparent 70%)`;
       });
       requestAnimationFrame(tick);
     };
@@ -400,15 +400,28 @@ function ParallaxBlobs() {
   }, [config]);
 
   return (
-    <div ref={containerRef} className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden={true}>
+    <div ref={containerRef} className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden>
       <div className="absolute inset-0 bg-gradient-to-b from-neutral-950 via-neutral-950 to-neutral-900" />
       {config.map((c, i) => (
-        <div key={i} ref={(el) => (blobsRef.current[i] = el!)} style={{
-          position: "absolute", width: c.size, height: c.size, left: `${c.baseX}%`, top: `${c.baseY}%`, transform: "translate(-50%, -50%)",
-          borderRadius: "50%", filter: `blur(${c.blur}px)`, opacity: c.opacity,
-          background: `radial-gradient(circle at 50% 50%, hsl(${c.hue} 95% 62% / 0.95) 0%, hsl(${c.hue} 90% 55% / 0.5) 35%, transparent 70%)`,
-          pointerEvents: "none", willChange: "transform, background", mixBlendMode: "normal",
-        }} />
+        <div
+          key={i}
+          ref={(el) => { if (el) blobsRef.current[i] = el; }}  // ✅ возвращаем void
+          style={{
+            position: "absolute",
+            width: c.size,
+            height: c.size,
+            left: `${c.baseX}%`,
+            top: `${c.baseY}%`,
+            transform: "translate(-50%, -50%)",
+            borderRadius: "50%",
+            filter: `blur(${c.blur}px)`,
+            opacity: c.opacity,
+            background: `radial-gradient(circle at 50% 50%, hsl(${c.hue} 95% 62% / 0.95) 0%, hsl(${c.hue} 90% 55% / 0.5) 35%, transparent 70%)`,
+            pointerEvents: "none",
+            willChange: "transform, background",
+            mixBlendMode: "normal",
+          }}
+        />
       ))}
     </div>
   );
@@ -567,7 +580,7 @@ export default function PortfolioPreview() {
                 {pfTab === "Дизайн" ? (
                   <a href={TELEGRAM_PORTFOLIO_DESIGN} target="_blank" rel="noopener noreferrer" className="text-sm text-violet-400 hover:text-violet-300 inline-flex items-center gap-1">Все работы по дизайну в Telegram <ExternalLink className="w-4 h-4" /></a>
                 ) : (
-                  <a href={TELEGRAM_PORTFOLIO_VIDEO} target="_blank" rel="noopener noreferrer" className="text-sm text-violet-400 hover:text-вiolet-300 inline-flex items-center gap-1">Все работы по видео в Telegram <ExternalLink className="w-4 h-4" /></a>
+                  <a href={TELEGRAM_PORTFOLIO_VIDEO} target="_blank" rel="noopener noreferrer" className="text-sm text-violet-400 hover:text-violet-300 inline-flex items-center gap-1">Все работы по видео в Telegram <ExternalLink className="w-4 h-4" /></a>
                 )}
               </div>
               <div className="mt-4 flex flex-wrap gap-2">
